@@ -1,0 +1,44 @@
+#include <cv.h>
+#include <highgui.h>
+#include <stdlib.h>
+#include <stdio.h>
+void my_mouse_callback(int event,int x,int y,int flags,void* param);
+int g_switch_value = 0;
+
+int main(int argc,char **argv)
+{
+    IplImage * image = cvLoadImage("/path/example.jpg");
+    IplImage* temp = cvCloneImage(image);
+    cvNamedWindow("Example");
+    cvSetMouseCallback("Example",my_mouse_callback,(void *) image);
+
+    while(1){
+    cvCopy(image,temp);
+    cvShowImage("Example",temp);
+
+    if(cvWaitKey(100) == 27) break;
+
+    }
+    cvReleaseImage(&image);
+    cvReleaseImage(&temp);
+    cvDestroyWindow("Example");
+}
+void my_mouse_callback(int event,int x,int y,int flags,void* param){
+    IplImage * image = (IplImage*) param;
+    switch(event){
+        case CV_EVENT_LBUTTONUP:{
+            CvScalar pixel = cvGet2D(image, y, x);
+            char s[100];
+            sprintf(s, "(%d,%d,%d,%d,%d)",(int)pixel.val[0],(int)pixel.val[0],(int)pixel.val[0],x,y);
+            CvFont font;
+            cvInitFont(&font,CV_FONT_HERSHEY_COMPLEX,0.5,0.5,0,1,8);
+            cvPutText(image,s,cvPoint(x,y),&font,cvScalar(0xff,0x00,0x00));
+        }
+        break;
+    }
+
+}
+
+
+
+
